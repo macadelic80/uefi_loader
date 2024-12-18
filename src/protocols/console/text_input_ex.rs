@@ -1,11 +1,10 @@
-use core::{ffi::c_void, ptr::{null, null_mut}};
+use core::ffi::c_void;
 
-use r_efi::{efi::{Status, SystemTable}, protocols::simple_text_input_ex::{KeyData, KeyNotifyFunction, KeyToggleState, Protocol}};
+use r_efi::{efi::{Status, SystemTable}, protocols::simple_text_input_ex::{KeyData, KeyNotifyFunction, Protocol}};
 
 pub struct TextInputEx {
     protocol: *mut Protocol,
 }
-
 
 pub enum ToggleState {
     ToggleStateValid = 0x80,
@@ -51,6 +50,10 @@ impl TextInputEx {
         } else {
             Err(status)
         }
+    }
+
+    pub fn wait_for_key_ex(&self) -> *mut c_void {
+        unsafe { (*self.protocol).wait_for_key_ex }
     }
     ///Set certain state for the input device.
     pub fn set_state(&self, key_toggle_state: ToggleState) -> Status {
