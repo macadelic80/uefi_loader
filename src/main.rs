@@ -3,14 +3,11 @@
 
 use r_efi::{
     efi,
-    protocols::{
-        graphics_output::Mode,
-        simple_text_input::InputKey
-    }
+    protocols::simple_text_input::InputKey
 };
 
-mod lib;
-use lib::{logger::log, text_output::TextOutput};
+mod protocols;
+use protocols::{logger::log, console::text_output::TextOutput};
 #[panic_handler]
 fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
     loop {}
@@ -53,7 +50,5 @@ pub extern "C" fn main(_h: efi::Handle, st: *mut efi::SystemTable) -> efi::Statu
                 return r;
             }
         }
-        // clear_screen(st);
-
     }
 }

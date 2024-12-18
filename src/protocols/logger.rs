@@ -1,7 +1,7 @@
 use core::fmt::{Write};
 use r_efi::efi;
 
-use super::{buffer_writer::BufferWriter, text_output::TextOutput};
+use super::{buffer_writer::BufferWriter, console::text_output::TextOutput};
 fn str_to_utf16(s: &str) -> [u16; 128] {
     let mut buffer = [0u16; 128];
     let mut i = 0;
