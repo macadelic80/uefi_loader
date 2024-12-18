@@ -1,0 +1,73 @@
+#![no_std]
+#![no_main]
+
+use core::panic::PanicInfo;
+mod efi;
+use efi::{efi_boot_services::EfiBootServices, efi_system_table::{EfiSystemTable, ImageHandle}};
+
+// Panic handler
+#[panic_handler]
+fn panic_handler(_info: &PanicInfo) -> ! {
+    loop {}
+}
+
+// Fonction pour convertir une chaîne en UTF-16 avec une terminaison nulle
+fn str_to_utf16(s: &str) -> [u16; 128] {
+    let mut buffer = [0u16; 128];
+    let mut i = 0;
+    for c in s.encode_utf16() {
+        if i >= 127 {
+            break;
+        }
+        buffer[i] = c;
+        i += 1;
+    }
+    buffer[i] = 0; // Terminaison nulle
+    buffer
+}
+#[repr(C)]
+#[derive(Debug, PartialEq, Eq)]
+pub enum EfiStatus {
+    /// The operation completed successfully.
+    Success = 0,
+    /// The request could not be completed due to a lack of resources.
+    OutOfResources = 0x8000_0009,
+    /// The operation is not supported.
+    Unsupported = 0x8000_0003,
+    /// A generic error occurred.
+    Error = 0x8000_0000,
+    // More specific error codes can be added here...
+    // Add more status codes as needed
+}
+
+
+// Point d'entrée EFI
+// #[no_mangle]
+#[export_name = "efi_main"]
+pub extern "C" fn main(ImageHandle: ImageHandle, system_table: *mut EfiSystemTable) -> EfiStatus {
+    // let status: EfiStatus;
+    let s = [
+        0x0048u16, 0x0065u16, 0x006cu16, 0x006cu16, 0x006fu16, // "Hello"
+        0x0020u16, //                                             " "
+        0x0057u16, 0x006fu16, 0x0072u16, 0x006cu16, 0x0064u16, // "World"
+        0x0021u16, //                                             "!"
+        0x000au16, //                                             "\n"
+        0x0000u16, //                                             NUL
+    ];
+    let status = unsafe {
+        // (((*(*system_table).con_out).output_string))((*system_table).con_out, str.as_ptr())
+        ((*(*system_table).con_out).output_string)((*system_table).con_out, s.as_ptr())
+    };
+    if status == EfiStatus::Error {
+        return status;
+    }
+
+    let r = unsafe {
+        let mut x: usize = 0;
+        ((*(*system_table).boot_services).wait_for_event)(1, &mut (*(*system_table).con_in).wait_for_key, &mut x)
+    };
+    if r == EfiStatus::Error {
+        return r;
+    }
+    EfiStatus::Success // EFI_SUCCESS
+}

@@ -1,0 +1,10 @@
+{
+    "llvm-target": "x86_64-pc-win32-coff",
+    "data-layout": "e-m:w-i64:64-f80:128-n8:16:32:64-S128",
+    "arch": "x86_64",
+    "os": "uefi",
+    "vendor": "unknown",
+    "linker-flavor": "ld.lld",
+    "features": "+soft-float",
+    "linker": "rust-lld"
+}
