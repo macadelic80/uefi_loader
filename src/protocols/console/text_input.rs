@@ -1,6 +1,6 @@
 use core::ffi::c_void;
 
-use r_efi::{efi::{Status, SystemTable}, protocols::simple_text_input::{InputKey, Protocol}};
+use r_efi::{efi::{Event, Status, SystemTable}, protocols::simple_text_input::{InputKey, Protocol}};
 
 // The Simple Text Input protocol defines the minimum input required to support the ConsoleIn device.
 /// The Simple Text Input protocol defines the minimum input required to support the ConsoleIn device.
@@ -30,7 +30,7 @@ impl TextInput {
         }
     }
 
-    pub fn wait_for_key(&self) -> *mut c_void {
+    pub fn wait_for_key(&self) -> Event {
         unsafe { (*self.protocol).wait_for_key }
     }
 }
