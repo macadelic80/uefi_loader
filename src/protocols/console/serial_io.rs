@@ -1,15 +1,15 @@
 use core::{ffi::c_void, ptr::null_mut};
 
-use r_efi::{efi::{Event, Status, SystemTable}, protocols::serial_io::{Mode, Protocol}};
+use r_efi::{efi::{Event, Status, SystemTable}, protocols::serial_io::{Mode, Protocol, PROTOCOL_GUID}};
 
 
-pub struct Pointer {
+pub struct SerialIO {
     protocol: *mut Protocol,
 }
-impl Pointer {
-    pub fn new(st: *mut SystemTable) -> Result<Pointer, Status> {
+impl SerialIO {
+    pub fn new(st: *mut SystemTable) -> Result<SerialIO, Status> {
         let mut protocol: *mut Protocol = core::ptr::null_mut();
-        let mut guid = r_efi::protocols::simple_pointer::PROTOCOL_GUID;
+        let mut guid = PROTOCOL_GUID;
         let boot_services = unsafe{&mut *st}.boot_services;
         let status = unsafe {
             ((*boot_services).locate_protocol)(
@@ -20,7 +20,7 @@ impl Pointer {
         };
     
         if status == Status::SUCCESS {
-            Ok(Pointer {
+            Ok(SerialIO {
                 protocol,
             })
         } else {
