@@ -40,11 +40,11 @@ impl Pointer {
             Err(status)
         }
     }
-
-    pub fn mode(&self) -> *mut Mode {
-        unsafe { (*self.protocol).mode }
+    ///Pointer to EFI_SIMPLE_POINTER_MODE data. The type EFI_SIMPLE_POINTER_MODE is defined in “Related Definitions” below.
+    pub fn mode(&self) -> Mode {
+        unsafe { *(*self.protocol).mode }
     }
-
+    ///Event to use with EFI_BOOT_SERVICES.WaitForEvent() to wait for input from the pointer device.
     pub fn wait_for_input(&self) -> Event {
         unsafe { (*self.protocol).wait_for_input }
     }
